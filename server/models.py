@@ -8,7 +8,7 @@ class User(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
-    _password_hash = db.Column(db.String, nullable=False)
+    _password_hash = db.Column(db.String)
     image_url = db.Column(db.String)
     bio = db.Column(db.String)
 
@@ -27,21 +27,21 @@ class User(db.Model, SerializerMixin):
     def authenticate(self, password):
         return bcrypt.check_password_hash(self._password_hash, password.encode("utf-8"))
 
-    def __repr(self):
-        return f"<User {self.username}, ID: {self.id} >"
+    def __repr__(self):
+        return f"User {self.username}"
 
 
 class Recipe(db.Model, SerializerMixin):
     __tablename__ = "recipes"
-    __table_arts__ = (db.CheckConstraint("length(instructions) >= 50"),)
+    __table_args__ = (db.CheckConstraint("length(instructions) >= 50"), )
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     instructions = db.Column(db.String, nullable=False)
     minutes_to_complete = db.Column(db.Integer)
-    user_id = db.Column(db.Integer(), db.ForeignKey("users.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
     user = db.relationship("User", back_populates="recipes")
 
     def __repr__(self):
-        return f"<Recipe {self.id}: {self.title}: {self.instructions}>"
+        return f"Recipe {self.id}: {self.title}"
